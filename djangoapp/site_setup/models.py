@@ -12,6 +12,9 @@ class MenuLink(models.Model):
     # charfield usado para o usuário poder utilizar paths: /caminho/exemplo
     url_or_path = models.CharField(max_length=2048)
     new_tab = models.BooleanField(default=False)
+    site_setup = models.ForeignKey(
+        'SiteSetup', on_delete=models.CASCADE, blank=True, null=True,
+    )
 
     def __str__(self):
         return self.text
