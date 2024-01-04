@@ -8,9 +8,8 @@ def context_processors_example(request):
 
 
 def site_setup(request):
-    setups = SiteSetup.objects.order_by('-id').first()
+    setup = SiteSetup.objects.order_by('-id').first()
+
     return {
-        'site_setup': {
-            'title': setups
-        },
+        'site_setup': setup,
     }
