@@ -158,6 +158,25 @@ def category(request, slug):
     )
 
 
+class TagListView(PostListView):
+    allow_empty = False
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            tags__slug=self.kwargs.get('slug')
+        )
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        page_title = (
+            f'{self.object_list[0].tags.first().name} - '  # type: ignore
+        )
+        context.update(
+            {'page_title': page_title, }
+        )
+        return context
+
+
 def tag(request, slug):
 
     posts = Post.objManager.get_published().filter(tags__slug=slug)
