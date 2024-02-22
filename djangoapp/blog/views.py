@@ -3,9 +3,9 @@ from django.views.generic.list import ListView
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from blog.models import Post, Page
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 
 posts = list(range(1000))
 
@@ -198,6 +198,41 @@ def tag(request, slug):
             'page_title': page_title,
         }
     )
+
+
+class SearchListView(PostListView):
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._search_value = ''
+
+    def setup(self, request: HttpRequest, *args: Any, **kwargs: Any) -> None:
+        self._search_value = request.GET.get('search', '').strip()
+        return super().setup(request, *args, **kwargs)
+
+    def get(self, request, *args: Any, **kwargs: Any) -> HttpResponse:
+
+        if self._search_value == '':
+            return redirect('blog:index')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            Q(title__icontains=self._search_value) |
+            Q(excerpt__icontains=self._search_value) |
+            Q(content__icontains=self._search_value)
+        )[:9]
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        page_title = (
+            f'{self._search_value[:20]} - '  # type: ignore
+        )
+        context.update({
+            'search_value': self._search_value,
+            'page_title': page_title,
+        })
+        return context
 
 
 def search(request):
