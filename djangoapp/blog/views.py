@@ -1,10 +1,11 @@
+from typing import Any
 from django.views.generic.list import ListView
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render
 from blog.models import Post, Page
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 posts = list(range(1000))
 
@@ -24,7 +25,6 @@ class PostListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(context)
         context.update(
             {'page_title': 'HOME - ', }
         )
@@ -49,6 +49,47 @@ def index(request):
     )
 
 # view que filtra por criador:
+
+
+class CreatedByListView(PostListView):
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self._temp_context = {}
+    # Usamos o get para previnir erros caso eu queira redirecionar para pagina
+
+    def get(self, request, *args: Any, **kwargs: Any) -> HttpResponse:
+
+        author_pk = self.kwargs.get('id')
+        user = User.objects.filter(pk=author_pk).first()
+
+        if user is None:
+            raise Http404
+
+        self._temp_context.update(
+            {
+                'author_pk': author_pk,
+                'user': user,
+
+            }
+        )
+
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(created_by__pk=self._temp_context['author_pk'])
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self._temp_context['user']
+
+        page_title = user.username + ' posts - '
+
+        context.update(
+            {'page_title': page_title, }
+        )
+        return context
 
 
 def created_by(request, id):
