@@ -1,9 +1,10 @@
 from typing import Any
-from django.views.generic.list import ListView
+from django.views.generic import ListView, DetailView
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
+# from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
+# from django.shortcuts import render
 from blog.models import Post, Page
 from django.http import Http404, HttpRequest, HttpResponse
 
@@ -31,22 +32,22 @@ class PostListView(ListView):
         return context
 
 
-def index(request):
+# def index(request):
 
-    posts = Post.objManager.get_published()
+#     posts = Post.objManager.get_published()
 
-    paginator = Paginator(posts, 9)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+#     paginator = Paginator(posts, 9)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': 'HOME - ',
-        }
-    )
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': page_obj,
+#             'page_title': 'HOME - ',
+#         }
+#     )
 
 # view que filtra por criador:
 
@@ -92,28 +93,28 @@ class CreatedByListView(PostListView):
         return context
 
 
-def created_by(request, id):
-    user = User.objects.filter(pk=id).first()
+# def created_by(request, id):
+#     user = User.objects.filter(pk=id).first()
 
-    if user is None:
-        raise Http404
+#     if user is None:
+#         raise Http404
 
-    page_title = user.username + ' posts - '
+#     page_title = user.username + ' posts - '
 
-    posts = Post.objManager.get_published().filter(created_by__pk=id)
+#     posts = Post.objManager.get_published().filter(created_by__pk=id)
 
-    paginator = Paginator(posts, 9)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+#     paginator = Paginator(posts, 9)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': page_title,
-        }
-    )
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': page_obj,
+#             'page_title': page_title,
+#         }
+#     )
 
 
 class CategoryListView(PostListView):
@@ -135,27 +136,27 @@ class CategoryListView(PostListView):
         return context
 
 
-def category(request, slug):
+# def category(request, slug):
 
-    posts = Post.objManager.get_published().filter(category__slug=slug)
+#     posts = Post.objManager.get_published().filter(category__slug=slug)
 
-    paginator = Paginator(posts, 9)
-    page_number = request.GET.get("page")
-    page_obj = paginator.get_page(page_number)
+#     paginator = Paginator(posts, 9)
+#     page_number = request.GET.get("page")
+#     page_obj = paginator.get_page(page_number)
 
-    if len(page_obj) == 0:
-        raise Http404()
+#     if len(page_obj) == 0:
+#         raise Http404()
 
-    page_title = f'{page_obj[0].category.name} - '
+#     page_title = f'{page_obj[0].category.name} - '
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': page_title,
-        }
-    )
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': page_obj,
+#             'page_title': page_title,
+#         }
+#     )
 
 
 class TagListView(PostListView):
@@ -177,27 +178,27 @@ class TagListView(PostListView):
         return context
 
 
-def tag(request, slug):
+# def tag(request, slug):
 
-    posts = Post.objManager.get_published().filter(tags__slug=slug)
+#     posts = Post.objManager.get_published().filter(tags__slug=slug)
 
-    paginator = Paginator(posts, 9)
-    page_number = request.GET.get("page", '').strip()
-    page_obj = paginator.get_page(page_number)
+#     paginator = Paginator(posts, 9)
+#     page_number = request.GET.get("page", '').strip()
+#     page_obj = paginator.get_page(page_number)
 
-    if len(page_obj) == 0:
-        raise Http404()
+#     if len(page_obj) == 0:
+#         raise Http404()
 
-    page_title = f'{page_obj[0].tags.first().name} - '
+#     page_title = f'{page_obj[0].tags.first().name} - '
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': page_obj,
-            'page_title': page_title,
-        }
-    )
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': page_obj,
+#             'page_title': page_title,
+#         }
+#     )
 
 
 class SearchListView(PostListView):
@@ -235,60 +236,100 @@ class SearchListView(PostListView):
         return context
 
 
-def search(request):
-    # GET -> http
-    # get -> python -> obter valor
-    search_value = request.GET.get('search')
-    posts = Post.objManager.get_published().filter(
-        Q(title__icontains=search_value) |
-        Q(excerpt__icontains=search_value) |
-        Q(content__icontains=search_value)
-    )[:9]
+# def search(request):
+#     # GET -> http
+#     # get -> python -> obter valor
+#     search_value = request.GET.get('search')
+#     posts = Post.objManager.get_published().filter(
+#         Q(title__icontains=search_value) |
+#         Q(excerpt__icontains=search_value) |
+#         Q(content__icontains=search_value)
+#     )[:9]
 
-    page_title = f'{search_value[:20]} - '
+#     page_title = f'{search_value[:20]} - '
 
-    return render(
-        request,
-        'blog/pages/index.html',
-        {
-            'page_obj': posts,
-            'search_value': search_value,
+#     return render(
+#         request,
+#         'blog/pages/index.html',
+#         {
+#             'page_obj': posts,
+#             'search_value': search_value,
+#             'page_title': page_title,
+#         }
+#     )
+
+
+class PageDetailView(DetailView):
+    template_name = 'blog/pages/page.html'
+    model = Page
+    slug_field = 'slug'
+    context_object_name = 'page'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published=True)
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        page = self.get_object()
+        page_title = f'{page.title} - '  # type:ignore
+        context.update({
             'page_title': page_title,
-        }
-    )
+        })
+        return context
 
 
-def page(request, slug):
-    page_obj = Page.objects.filter(is_published=True).filter(slug=slug).first()
+# def page(request, slug):
+#     page_obj = (
+#         Page.objects.filter(is_published=True).filter(slug=slug).first()
+#     )
 
-    if page_obj is None:
-        raise Http404()
+# #     if page_obj is None:
+# #         raise Http404()
 
-    page_title = f'{page_obj.title} - '
+# #     page_title = f'{page_obj.title} - '
 
-    return render(
-        request,
-        'blog/pages/page.html',
-        {
-            'page': page_obj,
-            'page_title': page_title,
-        }
-    )
+# #     return render(
+# #         request,
+# #         'blog/pages/page.html',
+# #         {
+# #             'page': page_obj,
+# #             'page_title': page_title,
+# #         }
+# #     )
 
 
-def post(request, slug):
-    post_obj = Post.objManager.get_published().filter(slug=slug).first()
+class PostDetailView(DetailView):
+    template_name = 'blog/pages/post.html'
+    model = Post
+    slug_field = 'slug'
+    context_object_name = 'post'
 
-    if post_obj is None:
-        raise Http404()
+    def get_queryset(self):
+        return super().get_queryset().filter(is_published=True)
 
-    page_title = f'{post_obj.title} - '
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        post = self.get_object()
+        post_title = f'{post.title} - '  # type:ignore
+        context.update({
+            'post_title': post_title,
+        })
+        return context
 
-    return render(
-        request,
-        'blog/pages/post.html',
-        {
-            'post': post_obj,
-            'page_title': page_title,
-        }
-    )
+
+# def post(request, slug):
+#     post_obj = Post.objManager.get_published().filter(slug=slug).first()
+
+#     if post_obj is None:
+#         raise Http404()
+
+#     page_title = f'{post_obj.title} - '
+
+#     return render(
+#         request,
+#         'blog/pages/post.html',
+#         {
+#             'post': post_obj,
+#             'page_title': page_title,
+#         }
+#     )
